@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D _rigidbody2D;
     private Animator _animator;
     private BoxCollider2D _feet;
+    private PolygonCollider2D _attackCollider2D;
 
     private bool _isGround;
     private float _currentAttackCD;
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         _feet = GetComponent<BoxCollider2D>();
+        _attackCollider2D = transform.GetChild(0).GetComponent<PolygonCollider2D>();
     }
 
     // Start is called before the first frame update
@@ -128,5 +130,15 @@ public class PlayerController : MonoBehaviour
             _animator.SetTrigger("Attack");
             _currentAttackCD = attackCD;
         }
+    }
+
+    public void EnableHitBox()
+    {
+        _attackCollider2D.enabled = true;
+    }
+
+    public void DisableHitBox()
+    {
+        _attackCollider2D.enabled = false;
     }
 }
