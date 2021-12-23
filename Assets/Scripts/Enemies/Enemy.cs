@@ -8,6 +8,15 @@ public abstract class Enemy : MonoBehaviour
     public int health;
     public int damage;
 
+    protected SpriteRenderer _spriteRenderer;
+    protected Color _originalColor;
+
+    public virtual void Awake()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _originalColor = _spriteRenderer.color;
+    }
+    
     public virtual void Start()
     {
         
@@ -26,10 +35,22 @@ public abstract class Enemy : MonoBehaviour
     public void BeDamaged(int damage)
     {
         health -= damage;
+        FlashRed();
         Debug.Log(gameObject+"当前血量："+health);
         if (health <= 0)
         {
             Destroy(gameObject);
         }
+    }
+
+    public void FlashRed()
+    {
+        _spriteRenderer.color = Color.red;
+        Invoke("ResetColor",0.5f);
+    }
+
+    public void ResetColor()
+    {
+        _spriteRenderer.color = _originalColor;
     }
 }
