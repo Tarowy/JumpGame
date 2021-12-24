@@ -8,6 +8,7 @@ public abstract class Enemy : MonoBehaviour
     public int health;
     public int damage;
     public float speed;
+    public GameObject bloodEffect;
 
     protected SpriteRenderer _spriteRenderer;
     protected Color _originalColor;
@@ -42,6 +43,8 @@ public abstract class Enemy : MonoBehaviour
         {
             Destroy(transform.parent.gameObject);
         }
+
+        Instantiate(bloodEffect, transform.position, Quaternion.identity);
     }
 
     public void FlashRed()
