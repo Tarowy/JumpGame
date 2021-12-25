@@ -45,6 +45,7 @@ public abstract class Enemy : MonoBehaviour
         }
 
         Instantiate(bloodEffect, transform.position, Quaternion.identity);
+        CameraFollow.cameraInfo.Shake();
     }
 
     public void FlashRed()
