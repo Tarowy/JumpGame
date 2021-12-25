@@ -5,33 +5,46 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    //行动相关
     public float runSpeed;
-    [HideInInspector]
     public int maxJumpTimes;
+    [HideInInspector]
     public int currentJumpTimes;
     public float jumpSpeed;
+    //攻击相关
     public float attackCD;
-
+    //血量、无敌时间
+    public float maxHealth;
+    [HideInInspector]
+    public float currentHealth;
+    
+    public int blinkTimes;
+    public float blinkInterval;
+    
+    public float invincibleTime;
+    [HideInInspector]
+    public float currentInvincibleTime;
+    public bool god;
+    //组件
     private Rigidbody2D _rigidbody2D;
     private Animator _animator;
     private BoxCollider2D _feet;
     private PolygonCollider2D _attackCollider2D;
-
+    private Renderer _renderer;
+    //判断变量
     private bool _isGround;
-    private float _currentAttackCD;
+    private float _currentAttackCd;
 
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        _feet = GetComponent<BoxCollider2D>();
+        _feet = transform.GetChild(1).GetComponent<BoxCollider2D>();
         _attackCollider2D = transform.GetChild(0).GetComponent<PolygonCollider2D>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
+        _renderer = GetComponent<Renderer>();
         
+        currentHealth = maxHealth;
+        currentInvincibleTime = invincibleTime;
     }
 
     // Update is called once per frame
@@ -40,6 +53,7 @@ public class PlayerController : MonoBehaviour
         Jump();
         CheckStatus();
         Attack();
+        BeDamaged();
     }
 
     private void FixedUpdate()
@@ -47,6 +61,9 @@ public class PlayerController : MonoBehaviour
         Run();
     }
 
+    /// <summary>
+    /// 行动控制
+    /// </summary>
     public void Run()
     {
         var axisH = Input.GetAxis("Horizontal");
@@ -70,7 +87,7 @@ public class PlayerController : MonoBehaviour
         Vector2 speed = new Vector2(runSpeed * axisH, _rigidbody2D.velocity.y);
         _rigidbody2D.velocity = speed;
     }
-
+    
     public void Jump()
     {
         if (!Input.GetKeyDown(KeyCode.Space))
@@ -92,6 +109,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 当前状态检测
+    /// </summary>
     public void CheckStatus()
     {
         _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground"));
@@ -118,25 +138,79 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 攻击行为
+    /// </summary>
     public void Attack()
     {
-        if (_currentAttackCD > 0)
+        if (_currentAttackCd > 0)
         {
-            _currentAttackCD -= Time.deltaTime;
+            _currentAttackCd -= Time.deltaTime;
         }
 
-        if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCD <= 0)
+        if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCd <= 0)
         {
             _animator.SetTrigger("Attack");
-            _currentAttackCD = attackCD;
+            _currentAttackCd = attackCD;
         }
     }
 
+    /// <summary>
+    /// 受伤行为
+    /// </summary>
+    /// <param name="damage"></param> 敌人施加的伤害值
+    public void BeDamaged(float damage)
+    {
+        if (!god)
+        {
+            currentHealth -= damage;
+            god = true;
+            Debug.Log("当前血量：" + currentHealth);
+            if (currentHealth <= 0)
+            {
+                Destroy(gameObject);
+            }
+            BlinkPlayer();
+            CameraFollow.cameraInfo.Shake();
+        }
+    }
+    public void BeDamaged()
+    {
+        if (god)
+        {
+            currentInvincibleTime -= Time.deltaTime;
+            if (currentInvincibleTime <= 0)
+            {
+                god = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 受伤后闪烁
+    /// </summary>
+    public void BlinkPlayer()
+    {
+        StartCoroutine(MultiplyBlink());
+    }
+    
+    IEnumerator MultiplyBlink()
+    {
+        for (int i = 0; i < blinkTimes * 2; i++)
+        {
+            _renderer.enabled = !_renderer.enabled;
+            yield return new WaitForSeconds(blinkInterval);
+        }
+    }
+    
+    /// <summary>
+    /// 动画使用的事件
+    /// </summary>
     public void EnableHitBox()
     {
         _attackCollider2D.enabled = true;
     }
-
+    
     public void DisableHitBox()
     {
         _attackCollider2D.enabled = false;
