@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public int currentJumpTimes;
     public float jumpSpeed;
+    public bool canControl;
     //攻击相关
     public float attackCD;
     //血量、无敌时间
@@ -45,20 +46,27 @@ public class PlayerController : MonoBehaviour
         
         currentHealth = maxHealth;
         currentInvincibleTime = invincibleTime;
+        canControl = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Jump();
-        CheckStatus();
-        Attack();
-        BeDamaged();
+        if (canControl)
+        {
+            Jump();
+            Attack();
+            CheckStatus();
+            BeDamaged();
+        }
     }
 
     private void FixedUpdate()
     {
-        Run();
+        if (canControl)
+        {
+            Run();
+        }
     }
 
     /// <summary>
@@ -168,7 +176,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("当前血量：" + currentHealth);
             if (currentHealth <= 0)
             {
-                Destroy(gameObject);
+                _animator.SetTrigger("Death");
             }
             BlinkPlayer();
             CameraFollow.cameraInfo.Shake();
@@ -214,5 +222,18 @@ public class PlayerController : MonoBehaviour
     public void DisableHitBox()
     {
         _attackCollider2D.enabled = false;
+    }
+
+    public void DisableControl()
+    {
+        canControl = false;
+        _feet.enabled = false;
+    }
+
+    public void BeKilled()
+    {
+        Debug.Log("玩家已死亡");
+        _rigidbody2D.velocity = new Vector2(0, 0);
+        // Destroy(gameObject);
     }
 }

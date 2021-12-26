@@ -7,7 +7,7 @@ public class ToDestory : MonoBehaviour
     public float destoryTime;
     
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         Destroy(gameObject,destoryTime);
     }

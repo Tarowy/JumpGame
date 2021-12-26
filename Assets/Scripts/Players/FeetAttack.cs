@@ -17,7 +17,7 @@ public class FeetAttack : MonoBehaviour
             playerController.god = true;
             playerController.currentInvincibleTime = playerController.invincibleTime;
             Debug.Log("无敌" + Time.time);
-            col.gameObject.GetComponent<Enemy>().BeDamaged(1f);
+            col.gameObject.GetComponent<Enemy>().BeDamaged(0.5f);
         }
     }
 }
