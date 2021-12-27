@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ToDestory : MonoBehaviour
+namespace Tools
 {
-    public float destoryTime;
-    
-    // Start is called before the first frame update
-    public void Start()
+    public class ToDestory : MonoBehaviour
     {
-        Destroy(gameObject,destoryTime);
+        public float destoryTime;
+    
+        // Start is called before the first frame update
+        public void Start()
+        {
+            Destroy(gameObject,destoryTime);
+        }
     }
 }
