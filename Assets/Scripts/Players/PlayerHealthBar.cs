@@ -5,6 +5,7 @@ namespace Players
 {
     public class PlayerHealthBar : MonoBehaviour
     {
+        [HideInInspector]
         public float maxHealth;
 
         public Image health;
@@ -16,6 +17,7 @@ namespace Players
             {
                 currentHealth = 0;
             }
+            Debug.Log("currentHealth:"+currentHealth);
             health.fillAmount = currentHealth / maxHealth;
             healthText.text = currentHealth + "/" + maxHealth;
         }

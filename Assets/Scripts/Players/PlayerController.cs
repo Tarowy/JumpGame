@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using Tools;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Players
 {
@@ -14,26 +16,13 @@ namespace Players
         public float jumpSpeed;
         public bool canControl;
         //攻击相关
-        public float attackCD;
-        //血量相关
-        public float maxHealth;
-        [HideInInspector]
-        public float currentHealth;
-        private PlayerHealthBar _playerHealthBar;
-        //受伤相关
-        public int blinkTimes;
-        public float blinkInterval;
-        //无敌相关
-        public float invincibleTime;
-        [HideInInspector]
-        public float currentInvincibleTime;
-        public bool god;
+        public float attackCd;
         //组件
         private Rigidbody2D _rigidbody2D;
         private Animator _animator;
         private BoxCollider2D _feet;
         private PolygonCollider2D _attackCollider2D;
-        private Renderer _renderer;
+        private PlayerHealth _playerHealth;
         //判断变量
         private bool _isGround;
         private float _currentAttackCd;
@@ -44,18 +33,10 @@ namespace Players
             _animator = GetComponent<Animator>();
             _feet = transform.GetChild(1).GetComponent<BoxCollider2D>();
             _attackCollider2D = transform.GetChild(0).GetComponent<PolygonCollider2D>();
-            _renderer = GetComponent<Renderer>();
-            _playerHealthBar = GetComponent<PlayerHealthBar>();
-        
-            currentHealth = maxHealth;
-            currentInvincibleTime = invincibleTime;
-            canControl = true;
-        }
+            _playerHealth = GetComponent<PlayerHealth>();
+            _playerHealth.animator = _animator;
 
-        private void Start()
-        {
-            _playerHealthBar.maxHealth = maxHealth;
-            _playerHealthBar.ChangeHealthBar(currentHealth);
+            canControl = true;
         }
 
         // Update is called once per frame
@@ -66,7 +47,6 @@ namespace Players
                 Jump();
                 Attack();
                 CheckStatus();
-                BeDamaged();
             }
         }
 
@@ -168,59 +148,10 @@ namespace Players
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCd <= 0)
             {
                 _animator.SetTrigger("Attack");
-                _currentAttackCd = attackCD;
+                _currentAttackCd = attackCd;
             }
         }
 
-        /// <summary>
-        /// 受伤行为
-        /// </summary>
-        /// <param name="damage"></param> 敌人施加的伤害值
-        public void BeDamaged(float damage)
-        {
-            if (!god)
-            {
-                currentHealth -= damage;
-                _playerHealthBar.ChangeHealthBar(currentHealth);
-                god = true;
-                Debug.Log("当前血量：" + currentHealth);
-                if (currentHealth <= 0)
-                {
-                    _animator.SetTrigger("Death");
-                }
-                BlinkPlayer();
-                CameraFollow.cameraInfo.Shake();
-            }
-        }
-        public void BeDamaged()
-        {
-            if (god)
-            {
-                currentInvincibleTime -= Time.deltaTime;
-                if (currentInvincibleTime <= 0)
-                {
-                    god = false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 受伤后闪烁
-        /// </summary>
-        public void BlinkPlayer()
-        {
-            StartCoroutine(MultiplyBlink());
-        }
-    
-        IEnumerator MultiplyBlink()
-        {
-            for (int i = 0; i < blinkTimes * 2; i++)
-            {
-                _renderer.enabled = !_renderer.enabled;
-                yield return new WaitForSeconds(blinkInterval);
-            }
-        }
-    
         /// <summary>
         /// 动画使用的事件
         /// </summary>

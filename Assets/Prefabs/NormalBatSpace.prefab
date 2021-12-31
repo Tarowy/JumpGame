@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  damage: 5
+  damage: 3
   speed: 2
   hitForce: 5
   bloodEffect: {fileID: 6151978422325736218, guid: 74ba7379ef8b8e54790d376c2e4f6081, type: 3}
@@ -170,7 +170,6 @@ MonoBehaviour:
   maxHealth: 0
   xOffset: 0
   yOffset: 20
-  uICamera: {fileID: 0}
   health: {fileID: 0}
 --- !u!1 &3260153088552146317
 GameObject:
