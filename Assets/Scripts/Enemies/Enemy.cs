@@ -41,7 +41,7 @@ namespace Enemies
                 Vector2 direction = collision.transform.position - transform.position;
                 collision.GetComponent<Rigidbody2D>().AddForce(direction * hitForce, ForceMode2D.Impulse);
                 Debug.Log(gameObject.name+"对"+collision.name+"产生了击退");
-                collision.GetComponent<PlayerController>().BeDamaged(damage);
+                collision.GetComponent<PlayerHealth>().BeDamaged(damage);
             }
         }
 

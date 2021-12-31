@@ -5,19 +5,20 @@ namespace Players
 {
     public class FeetAttack : MonoBehaviour
     {
-        public PlayerController playerController;
+        public PlayerHealth playerHealth;
+        public float feetDamage;
     
         private void OnTriggerEnter2D (Collider2D col)
         {
-            Debug.Log("碰撞："+col.gameObject);
+            // Debug.Log("碰撞："+col.gameObject);
         
             if (col.gameObject.CompareTag("Enemy"))
             {
-                Debug.Log("脚部碰撞");
-                playerController.god = true;
-                playerController.currentInvincibleTime = playerController.invincibleTime;
+                // Debug.Log("脚部碰撞");
+                playerHealth.god = true;
+                playerHealth.currentInvincibleTime = playerHealth.invincibleTime;
                 Debug.Log("无敌" + Time.time);
-                col.gameObject.GetComponent<Enemy>().BeDamaged(0.5f);
+                col.gameObject.GetComponent<Enemy>().BeDamaged(feetDamage);
             }
         }
     }
