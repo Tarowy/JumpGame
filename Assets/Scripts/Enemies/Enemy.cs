@@ -35,12 +35,13 @@ namespace Enemies
 
         public virtual void OnCollisionEnter2D(Collision2D col)
         {
+            Debug.Log(gameObject.name + "与" + col.gameObject.name + "碰撞了");
             var collision = col.gameObject;
             if (collision.CompareTag("Player"))
             {
                 Vector2 direction = collision.transform.position - transform.position;
                 collision.GetComponent<Rigidbody2D>().AddForce(direction * hitForce, ForceMode2D.Impulse);
-                Debug.Log(gameObject.name+"对"+collision.name+"产生了击退");
+                // Debug.Log(gameObject.name+"对"+collision.name+"产生了击退");
                 collision.GetComponent<PlayerHealth>().BeDamaged(damage);
             }
         }
@@ -50,7 +51,7 @@ namespace Enemies
             health -= damage;
             EnemyHealth.ChangeHealth(health);
             FlashRed();
-            Debug.Log(gameObject+"当前血量："+health);
+            // Debug.Log(gameObject+"当前血量："+health);
             if (health <= 0)
             {
                 Destroy(EnemyHealth.healthIns);

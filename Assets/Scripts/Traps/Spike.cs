@@ -8,21 +8,22 @@ namespace Traps
     {
         public float damagePercent;
         public float hitForce;
+        public float hitStunTime;
         public Vector2 direction;
 
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Player"))
             {
-                // Debug.Log(gameObject.name+"伤害了"+other.gameObject.name);
                 var playerHealth = other.GetComponent<PlayerHealth>();
-                var isDeath = playerHealth.BeDamaged(playerHealth.maxHealth * damagePercent);
-                if (isDeath)
+                if (playerHealth.BeDamaged(playerHealth.maxHealth * damagePercent))
                 {
                     return;
                 }
-                
+                other.GetComponent<PlayerController>().ExecuteRestoreHitStun(hitStunTime);
+
                 other.GetComponent<Rigidbody2D>().AddForce(direction * hitForce, ForceMode2D.Impulse);
+                Debug.Log("受击力度："+hitForce);
             }
         }
     }

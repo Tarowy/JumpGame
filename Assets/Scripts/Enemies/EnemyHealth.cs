@@ -29,9 +29,9 @@ namespace Enemies
 
         public void HealthFollow()
         {
-            var screenPos =  Camera.main.WorldToScreenPoint(gameObject.transform.position) +
-                            new Vector3(xOffset, yOffset, 0);
-            healthIns.transform.position = screenPos;
+            var screenPos =
+                Camera.main.WorldToScreenPoint(gameObject.transform.position + new Vector3(xOffset, yOffset, 0));
+                             healthIns.transform.position = screenPos;
         }
 
         public void ChangeHealth(float currentHealth)

@@ -8,6 +8,8 @@ TagManager:
   - Enemy
   - feet
   - Trap
+  - MovingPlatform
+  - OneWayPlatform
   layers:
   - Default
   - TransparentFX
@@ -19,7 +21,7 @@ TagManager:
   - Enemy
   - Player
   - Trap
-  - 
+  - Platform
   - 
   - 
   - 

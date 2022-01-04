@@ -26,6 +26,7 @@ namespace Players
         //判断变量
         private bool _isGround;
         private float _currentAttackCd;
+        private bool _isPlatform;
 
         private void Awake()
         {
@@ -46,8 +47,8 @@ namespace Players
             {
                 Jump();
                 Attack();
-                CheckStatus();
             }
+            CheckStatus();
         }
 
         private void FixedUpdate()
@@ -87,7 +88,7 @@ namespace Players
     
         public void Jump()
         {
-            if (!Input.GetKeyDown(KeyCode.Space))
+            if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.S))
             {
                 return;
             }
@@ -111,7 +112,7 @@ namespace Players
         /// </summary>
         public void CheckStatus()
         {
-            _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground"));
+            _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground"))||_feet.IsTouchingLayers(LayerMask.GetMask("Platform"));
         
             if (_rigidbody2D.velocity == new Vector2(0, 0))
             {
@@ -150,6 +151,17 @@ namespace Players
                 _animator.SetTrigger("Attack");
                 _currentAttackCd = attackCd;
             }
+        }
+
+        public void ExecuteRestoreHitStun(float recoverTime)
+        {
+            canControl = false;
+            Invoke("RestoreFromHitStun", recoverTime);
+        }
+
+        private void RestoreFromHitStun() //从硬直中恢复
+        {
+            canControl = true;
         }
 
         /// <summary>

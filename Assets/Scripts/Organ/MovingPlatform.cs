@@ -28,11 +28,7 @@ public class MovingPlatform : MonoBehaviour
         {
             if (ReduceTime())
             {
-                _posIndex += 1;
-                if (_posIndex > movePos.Length - 1)
-                {
-                    _posIndex = 0;
-                }
+                _posIndex = ++_posIndex > (movePos.Length - 1) ? 0 : _posIndex;
             }
         }
     }
@@ -44,7 +40,6 @@ public class MovingPlatform : MonoBehaviour
         {
             return true;
         }
-        Debug.Log("移动...");
         transform.position =
             Vector2.MoveTowards(transform.position, movePos[_posIndex].position, moveSpeed * Time.deltaTime);
         return false;
@@ -52,7 +47,6 @@ public class MovingPlatform : MonoBehaviour
 
     private bool ReduceTime()
     {
-        Debug.Log("计时...");
         if (currentWaitTime <= 0)
         {
             currentWaitTime = waitTime;
@@ -66,7 +60,7 @@ public class MovingPlatform : MonoBehaviour
     {
         if (other.CompareTag("feet") && other.GetType().ToString().Equals("UnityEngine.BoxCollider2D"))
         {
-            Debug.Log("平台进入:"+other.name);
+            Debug.Log("................................");
             _playerParent = other.transform.parent.parent;
             other.transform.parent.parent = transform;
         }
@@ -76,7 +70,6 @@ public class MovingPlatform : MonoBehaviour
     {
         if (other.CompareTag("feet") && other.GetType().ToString().Equals("UnityEngine.BoxCollider2D"))
         {
-            Debug.Log("平台退出:"+other.name);
             other.gameObject.transform.parent.parent = _playerParent;
         }
     }
