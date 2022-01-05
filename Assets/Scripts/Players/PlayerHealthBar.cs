@@ -17,7 +17,7 @@ namespace Players
             {
                 currentHealth = 0;
             }
-            Debug.Log("currentHealth:"+currentHealth);
+            // Debug.Log("currentHealth:"+currentHealth);
             health.fillAmount = currentHealth / maxHealth;
             healthText.text = currentHealth + "/" + maxHealth;
         }

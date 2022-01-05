@@ -10,6 +10,7 @@ TagManager:
   - Trap
   - MovingPlatform
   - OneWayPlatform
+  - Ladder
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - Player
   - Trap
   - Platform
-  - 
+  - Ladder
   - 
   - 
   - 
@@ -49,6 +50,9 @@ TagManager:
     locked: 0
   - name: BackGround
     uniqueID: 1779287407
+    locked: 0
+  - name: Ladder
+    uniqueID: 1970967235
     locked: 0
   - name: Player
     uniqueID: 1035051061

@@ -11,10 +11,12 @@ namespace Players
         //行动相关
         public float runSpeed;
         public int maxJumpTimes;
-        [HideInInspector]
+        // [HideInInspector]
         public int currentJumpTimes;
         public float jumpSpeed;
         public bool canControl;
+        public float climbSpeed;
+        private float _gravityScale;
         //攻击相关
         public float attackCd;
         //组件
@@ -26,7 +28,7 @@ namespace Players
         //判断变量
         private bool _isGround;
         private float _currentAttackCd;
-        private bool _isPlatform;
+        private bool _isLadder;
 
         private void Awake()
         {
@@ -47,6 +49,8 @@ namespace Players
             {
                 Jump();
                 Attack();
+                DownPlatform();
+                ClimbLadder();
             }
             CheckStatus();
         }
@@ -88,7 +92,7 @@ namespace Players
     
         public void Jump()
         {
-            if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.S))
+            if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.S))
             {
                 return;
             }
@@ -112,8 +116,9 @@ namespace Players
         /// </summary>
         public void CheckStatus()
         {
-            _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground"))||_feet.IsTouchingLayers(LayerMask.GetMask("Platform"));
-        
+            _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground")) 
+                        || _feet.IsTouchingLayers(LayerMask.GetMask("Platform"));
+
             if (_rigidbody2D.velocity == new Vector2(0, 0))
             {
                 _animator.SetBool("Idle",true);
@@ -136,6 +141,11 @@ namespace Players
             }
         }
 
+        public void RestoreCollision()
+        {
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platform"), false);
+        }
+
         /// <summary>
         /// 攻击行为
         /// </summary>
@@ -156,12 +166,61 @@ namespace Players
         public void ExecuteRestoreHitStun(float recoverTime)
         {
             canControl = false;
-            Invoke("RestoreFromHitStun", recoverTime);
+            Invoke(nameof(RestoreFromHitStun), recoverTime);
         }
 
         private void RestoreFromHitStun() //从硬直中恢复
         {
             canControl = true;
+        }
+        
+        public void DownPlatform()
+        {
+            if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+            {
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platform"), true);
+                Invoke(nameof(RestoreCollision),0.5f);
+            }
+        }
+
+        public void ClimbLadder()
+        {
+            if (_isLadder)
+            {
+                var axisV = Input.GetAxis("Vertical");
+                if (Math.Abs(axisV) > 0.5f)
+                {
+                    Debug.Log("攀爬...");
+                    _rigidbody2D.isKinematic = true;
+                    // _rigidbody2D.gravityScale = 0.1f;
+                    _rigidbody2D.velocity = new Vector2(0, climbSpeed * axisV);
+                    _animator.SetBool("Climb",true);
+                }
+            }
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            Debug.Log("TriggerEnter2D："+other.name+"---"+Time.time);
+            if (other.CompareTag("Ladder"))
+            {
+                _isLadder = true;
+                // _gravityScale = _rigidbody2D.gravityScale;
+                Debug.Log("_gravityScaleStart:"+_gravityScale+"---"+Time.time);
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            Debug.Log("TriggerExit2D："+other.name+"---"+Time.time);
+            if (other.CompareTag("Ladder"))
+            {
+                _isLadder = false;
+                // _rigidbody2D.gravityScale = _gravityScale;
+                _rigidbody2D.isKinematic = false;
+                Debug.Log("_gravityScaleExit:"+_gravityScale+"---"+Time.time);
+                _animator.SetBool("Climb",false);
+            }
         }
 
         /// <summary>

@@ -55,7 +55,7 @@ namespace Players
         /// <param name="damage"></param> 敌人施加的伤害值
         public bool BeDamaged(float damage)
         {
-            Debug.Log("无敌");
+            // Debug.Log("无敌");
             if (!god && !_isDeath)
             {
                 currentHealth -= damage;
