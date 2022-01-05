@@ -29,6 +29,7 @@ namespace Players
         private bool _isGround;
         private float _currentAttackCd;
         private bool _isLadder;
+        private bool _isClimbing;
 
         private void Awake()
         {
@@ -131,6 +132,7 @@ namespace Players
             if (_isGround)
             {
                 _animator.SetBool("Fall",false);
+                _animator.SetBool("Climb", false);
                 return;
             }
 
@@ -188,37 +190,43 @@ namespace Players
             if (_isLadder)
             {
                 var axisV = Input.GetAxis("Vertical");
-                if (Math.Abs(axisV) > 0.5f)
+                //如果处于梯子处，且有垂直输出，说明要爬梯子
+                if (Math.Abs(axisV) >= 0.5f && !_isClimbing) //为了让其在爬梯子的时候只执行一次
                 {
-                    Debug.Log("攀爬...");
-                    _rigidbody2D.isKinematic = true;
-                    // _rigidbody2D.gravityScale = 0.1f;
-                    _rigidbody2D.velocity = new Vector2(0, climbSpeed * axisV);
+                    _rigidbody2D.gravityScale = 0f;
                     _animator.SetBool("Climb",true);
+                    _isClimbing = true;
+                }
+                if (_isClimbing)
+                {
+                    if (Math.Abs(axisV) < 0.5f)
+                    {
+                        _rigidbody2D.velocity = new Vector2(0, 0);
+                        _animator.speed = 0; //暂停动画
+                        return;
+                    }
+                    _animator.speed = 1;
+                    _rigidbody2D.velocity = new Vector2(0, climbSpeed * axisV);
                 }
             }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log("TriggerEnter2D："+other.name+"---"+Time.time);
             if (other.CompareTag("Ladder"))
             {
                 _isLadder = true;
-                // _gravityScale = _rigidbody2D.gravityScale;
-                Debug.Log("_gravityScaleStart:"+_gravityScale+"---"+Time.time);
+                _gravityScale = _rigidbody2D.gravityScale;
             }
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            Debug.Log("TriggerExit2D："+other.name+"---"+Time.time);
             if (other.CompareTag("Ladder"))
             {
                 _isLadder = false;
-                // _rigidbody2D.gravityScale = _gravityScale;
-                _rigidbody2D.isKinematic = false;
-                Debug.Log("_gravityScaleExit:"+_gravityScale+"---"+Time.time);
+                _rigidbody2D.gravityScale = _gravityScale;
+                _isClimbing = false;
                 _animator.SetBool("Climb",false);
             }
         }
