@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260153088545109720}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.72, y: 0.88, z: 10.806785}
+  m_LocalPosition: {x: 1.72, y: 0.88, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3260153089120363535}
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1680246347
-  m_SortingLayer: 3
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 8647823593821616703, guid: 84768d1d638c835418aaca19011f06ef, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -148,6 +148,7 @@ MonoBehaviour:
   speed: 2
   hitForce: 5
   bloodEffect: {fileID: 6151978422325736218, guid: 74ba7379ef8b8e54790d376c2e4f6081, type: 3}
+  coin: {fileID: 926694228315119280, guid: 490882a5f3e6c044e9064c0411d6b54a, type: 3}
   leftDownPos: {fileID: 3260153089876326799}
   rightUpPos: {fileID: 3260153088552146314}
   movePos: {x: 0, y: 0}
@@ -195,7 +196,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260153088552146317}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.77, y: 2.35, z: 10.806785}
+  m_LocalPosition: {x: 4.31, y: 1.74, z: 10.806785}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3260153089120363535}
@@ -258,7 +259,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260153089876326798}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.3, y: -0.91, z: 10.806785}
+  m_LocalPosition: {x: -1.05, y: -1.89, z: 10.806785}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3260153089120363535}

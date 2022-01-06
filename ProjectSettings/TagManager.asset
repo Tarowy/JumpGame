@@ -11,6 +11,7 @@ TagManager:
   - MovingPlatform
   - OneWayPlatform
   - Ladder
+  - Coin
   layers:
   - Default
   - TransparentFX
@@ -24,9 +25,9 @@ TagManager:
   - Trap
   - Platform
   - Ladder
-  - 
-  - 
-  - 
+  - TriggerBox
+  - Item
+  - Weapon
   - 
   - 
   - 
@@ -53,6 +54,9 @@ TagManager:
     locked: 0
   - name: Ladder
     uniqueID: 1970967235
+    locked: 0
+  - name: Coin
+    uniqueID: 1646706941
     locked: 0
   - name: Player
     uniqueID: 1035051061

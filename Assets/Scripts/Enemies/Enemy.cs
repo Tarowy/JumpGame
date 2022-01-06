@@ -14,6 +14,8 @@ namespace Enemies
         protected SpriteRenderer SpriteRenderer;
         protected Color OriginalColor;
         protected EnemyHealth EnemyHealth;
+        
+        public GameObject coin;
 
         public virtual void Awake()
         {
@@ -56,6 +58,10 @@ namespace Enemies
             {
                 Destroy(EnemyHealth.healthIns);
                 Destroy(transform.parent.gameObject);
+                if (gameObject != null)
+                {
+                    Instantiate(coin, transform.position, Quaternion.identity);
+                }
             }
 
             Instantiate(bloodEffect, transform.position, Quaternion.identity);

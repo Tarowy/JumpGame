@@ -120,8 +120,10 @@ namespace Players
             _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground")) 
                         || _feet.IsTouchingLayers(LayerMask.GetMask("Platform"));
 
-            if (_rigidbody2D.velocity == new Vector2(0, 0))
+            //如果用是不是0来判断，速度很小无限趋近于静止的时候也会导致无法变为静止状态
+            if (Math.Abs(_rigidbody2D.velocity.x) < 0.5f && Math.Abs(_rigidbody2D.velocity.y) < 0.5f)
             {
+                Debug.Log("静止" + Time.time);
                 _animator.SetBool("Idle",true);
             }
             else
@@ -132,7 +134,11 @@ namespace Players
             if (_isGround)
             {
                 _animator.SetBool("Fall",false);
-                _animator.SetBool("Climb", false);
+                //防止刚开始爬的时候脚部还在地面导致一直无法切换攀爬变量
+                if (!_isClimbing)
+                { 
+                    _animator.SetBool("Climb", false);
+                }
                 return;
             }
 
@@ -160,6 +166,7 @@ namespace Players
 
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCd <= 0)
             {
+                Debug.Log("攻击..."+Time.time);
                 _animator.SetTrigger("Attack");
                 _currentAttackCd = attackCd;
             }
@@ -191,8 +198,9 @@ namespace Players
             {
                 var axisV = Input.GetAxis("Vertical");
                 //如果处于梯子处，且有垂直输出，说明要爬梯子
-                if (Math.Abs(axisV) >= 0.5f && !_isClimbing) //为了让其在爬梯子的时候只执行一次
+                if (axisV > 0 && !_isClimbing) //为了让其在爬梯子的时候只执行一次
                 {
+                    //脚部位于地面速度还向下的话就不会进入爬梯子状态
                     _rigidbody2D.gravityScale = 0f;
                     _animator.SetBool("Climb",true);
                     _isClimbing = true;
@@ -207,6 +215,11 @@ namespace Players
                     }
                     _animator.speed = 1;
                     _rigidbody2D.velocity = new Vector2(0, climbSpeed * axisV);
+                    if (_isGround && axisV < 0)
+                    {
+                        _animator.SetBool("Climb",false);
+                        _isClimbing = false;
+                    }
                 }
             }
         }
@@ -224,10 +237,15 @@ namespace Players
         {
             if (other.CompareTag("Ladder"))
             {
+                //清除梯子相关的变量
                 _isLadder = false;
-                _rigidbody2D.gravityScale = _gravityScale;
                 _isClimbing = false;
+                _rigidbody2D.gravityScale = _gravityScale;
+                //重置梯子相关的动画变量，并给予速度缓冲
+                _animator.speed = 1;
                 _animator.SetBool("Climb",false);
+                _rigidbody2D.velocity = new Vector2(0, _rigidbody2D.velocity.y * 0.1f);
+                Debug.Log("脱离攀爬");
             }
         }
 
