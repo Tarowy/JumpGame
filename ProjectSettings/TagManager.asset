@@ -12,6 +12,7 @@ TagManager:
   - OneWayPlatform
   - Ladder
   - Coin
+  - Sign
   layers:
   - Default
   - TransparentFX
@@ -55,7 +56,7 @@ TagManager:
   - name: Ladder
     uniqueID: 1970967235
     locked: 0
-  - name: Coin
+  - name: Item
     uniqueID: 1646706941
     locked: 0
   - name: Player

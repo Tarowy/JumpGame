@@ -27,6 +27,7 @@ namespace Players
         private PlayerHealth _playerHealth;
         //判断变量
         private bool _isGround;
+        private bool _isPlatform;
         private float _currentAttackCd;
         private bool _isLadder;
         private bool _isClimbing;
@@ -67,7 +68,7 @@ namespace Players
         /// <summary>
         /// 行动控制
         /// </summary>
-        public void Run()
+        private void Run()
         {
             var axisH = Input.GetAxis("Horizontal");
             if (axisH == 0)
@@ -75,6 +76,7 @@ namespace Players
                 _animator.SetBool("Run",false);
                 return;
             }
+            
             _animator.SetBool("Run",true);
 
             if (axisH > 0.1f)
@@ -87,100 +89,26 @@ namespace Players
             }
 
             //直接改变刚体速度
-            Vector2 speed = new Vector2(runSpeed * axisH, _rigidbody2D.velocity.y);
-            _rigidbody2D.velocity = speed;
+            _rigidbody2D.velocity = new Vector2(runSpeed * axisH, _rigidbody2D.velocity.y);
         }
-    
-        public void Jump()
+
+        private void Jump()
         {
-            if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.S))
-            {
-                return;
-            }
-        
+            //如果按住S或者没按space就不执行
+            if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.S)) return;
+            
             if (_isGround)
             {
                 currentJumpTimes = maxJumpTimes;
             }
-        
-            if (currentJumpTimes > 0)
-            {
-                _animator.SetBool("Jump",true);
-                _animator.SetBool("Fall",false);
-                _rigidbody2D.velocity = Vector2.up * new Vector2(0, jumpSpeed);
-                currentJumpTimes--;
-            }
-        }
 
-        /// <summary>
-        /// 当前状态检测
-        /// </summary>
-        public void CheckStatus()
-        {
-            _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground")) 
-                        || _feet.IsTouchingLayers(LayerMask.GetMask("Platform"));
-
-            //如果用是不是0来判断，速度很小无限趋近于静止的时候也会导致无法变为静止状态
-            if (Math.Abs(_rigidbody2D.velocity.x) < 0.5f && Math.Abs(_rigidbody2D.velocity.y) < 0.5f)
-            {
-                Debug.Log("静止" + Time.time);
-                _animator.SetBool("Idle",true);
-            }
-            else
-            {
-                _animator.SetBool("Idle",false);
-            }
-        
-            if (_isGround)
-            {
-                _animator.SetBool("Fall",false);
-                //防止刚开始爬的时候脚部还在地面导致一直无法切换攀爬变量
-                if (!_isClimbing)
-                { 
-                    _animator.SetBool("Climb", false);
-                }
-                return;
-            }
-
-            if (_rigidbody2D.velocity.y < 0f && !_isGround)
-            {
-                _animator.SetBool("Jump",false);
-                _animator.SetBool("Fall", true);
-            }
-        }
-
-        public void RestoreCollision()
-        {
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platform"), false);
-        }
-
-        /// <summary>
-        /// 攻击行为
-        /// </summary>
-        public void Attack()
-        {
-            if (_currentAttackCd > 0)
-            {
-                _currentAttackCd -= Time.deltaTime;
-            }
-
-            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCd <= 0)
-            {
-                Debug.Log("攻击..."+Time.time);
-                _animator.SetTrigger("Attack");
-                _currentAttackCd = attackCd;
-            }
-        }
-
-        public void ExecuteRestoreHitStun(float recoverTime)
-        {
-            canControl = false;
-            Invoke(nameof(RestoreFromHitStun), recoverTime);
-        }
-
-        private void RestoreFromHitStun() //从硬直中恢复
-        {
-            canControl = true;
+            //跳跃次数为0也不执行
+            if (currentJumpTimes <= 0) return;
+            
+            _animator.SetBool("Jump",true);
+            _animator.SetBool("Fall",false);
+            _rigidbody2D.velocity = Vector2.up * new Vector2(0, jumpSpeed);
+            currentJumpTimes--;
         }
         
         public void DownPlatform()
@@ -191,18 +119,23 @@ namespace Players
                 Invoke(nameof(RestoreCollision),0.5f);
             }
         }
-
+        
+        public void RestoreCollision()
+        {
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platform"), false);
+        }
+        
         public void ClimbLadder()
         {
             if (_isLadder)
             {
                 var axisV = Input.GetAxis("Vertical");
-                //如果处于梯子处，且有垂直输出，说明要爬梯子
-                if (axisV > 0 && !_isClimbing) //为了让其在爬梯子的时候只执行一次
+                //如果处于梯子处，且有垂直输出，说明要爬梯子，但是脚部位于地面速度还向下的话就不会进入爬梯子状态
+                if (axisV > 0 && !_isClimbing && !_isPlatform) //为了让其在爬梯子的时候只执行一次
                 {
-                    //脚部位于地面速度还向下的话就不会进入爬梯子状态
                     _rigidbody2D.gravityScale = 0f;
                     _animator.SetBool("Climb",true);
+                    _animator.SetBool("Jump",false); //防止跳跃途中上梯子导致下梯子后jump为true而处于跳跃动画
                     _isClimbing = true;
                 }
                 if (_isClimbing)
@@ -224,6 +157,77 @@ namespace Players
             }
         }
 
+        /// <summary>
+        /// 当前状态检测
+        /// </summary>
+        private void CheckStatus()
+        {
+            _isPlatform = _feet.IsTouchingLayers(LayerMask.GetMask("Platform"));
+            _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground")) || _isPlatform;
+
+            //如果用是不是0来判断，速度很小无限趋近于静止的时候也会导致无法变为静止状态
+            if (Math.Abs(_rigidbody2D.velocity.x) < 0.5f && Math.Abs(_rigidbody2D.velocity.y) < 0.5f)
+            {
+                // Debug.Log("静止" + Time.time);
+                _animator.SetBool("Idle",true);
+            }
+            else
+            {
+                _animator.SetBool("Idle",false);
+            }
+        
+            if (_isGround)
+            {
+                _animator.SetBool("Fall",false);
+                //防止刚开始爬的时候脚部还在地面导致一直无法切换攀爬变量
+                if (!_isClimbing)
+                { 
+                    _animator.SetBool("Climb", false);
+                }
+                return;
+            }
+
+            if (!(_rigidbody2D.velocity.y < 0.1f) || _isGround) return;
+            _animator.SetBool("Jump",false);
+            _animator.SetBool("Fall", true);
+        }
+
+        /// <summary>
+        /// 攻击行为
+        /// </summary>
+        private void Attack()
+        {
+            if (_currentAttackCd > 0)
+            {
+                _currentAttackCd -= Time.deltaTime;
+            }
+
+            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCd <= 0)
+            {
+                _animator.SetTrigger("Attack");
+                _currentAttackCd = attackCd;
+            }
+        }
+
+        /// <summary>
+        /// 硬直
+        /// </summary>
+        /// <param name="recoverTime"></param>
+        public void ExecuteRestoreHitStun(float recoverTime)
+        {
+            canControl = false;
+            Invoke(nameof(RestoreFromHitStun), recoverTime);
+        }
+
+        private void RestoreFromHitStun() //从硬直中恢复
+        {
+            canControl = true;
+        }
+        
+        /// <summary>
+        /// Unity组件
+        /// </summary>
+        /// <param name="other"></param>
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Ladder"))
@@ -237,15 +241,15 @@ namespace Players
         {
             if (other.CompareTag("Ladder"))
             {
+                Debug.Log("脱离");
                 //清除梯子相关的变量
                 _isLadder = false;
                 _isClimbing = false;
                 _rigidbody2D.gravityScale = _gravityScale;
                 //重置梯子相关的动画变量，并给予速度缓冲
                 _animator.speed = 1;
-                _animator.SetBool("Climb",false);
-                _rigidbody2D.velocity = new Vector2(0, _rigidbody2D.velocity.y * 0.1f);
-                Debug.Log("脱离攀爬");
+                _animator.SetBool("Climb", false);
+                _rigidbody2D.velocity = new Vector2(0, _rigidbody2D.velocity.y * 0.45f);
             }
         }
 
