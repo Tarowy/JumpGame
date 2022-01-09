@@ -13,7 +13,7 @@ namespace UI
         private void Update()
         {
             if (_signIns == null) return;
-
+            //文本框跟随
             if (Camera.main is { })
                 _signIns.transform.position =
                     Camera.main.WorldToScreenPoint(gameObject.transform.position) +
@@ -22,11 +22,9 @@ namespace UI
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
-            {
-                _signIns = Instantiate(signPre, GameObject.Find("Canvas").transform);
-                _signIns.transform.GetChild(0).GetComponent<Text>().text = signText;
-            }
+            if (!other.CompareTag("Player")) return;
+            _signIns = Instantiate(signPre, GameObject.Find("Canvas").transform);
+            _signIns.GetComponent<SignUIWithStart>().signText = signText;
         }
 
         private void OnTriggerExit2D(Collider2D other)
