@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260153088545109720}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.72, y: 0.88, z: 0}
+  m_LocalPosition: {x: 1.67, y: 0.93, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3260153089120363535}
@@ -148,6 +148,7 @@ MonoBehaviour:
   speed: 2
   hitForce: 5
   bloodEffect: {fileID: 6151978422325736218, guid: 74ba7379ef8b8e54790d376c2e4f6081, type: 3}
+  floatDamage: {fileID: 6277832579601199706, guid: b36df3838d3416d4eb0b068eec217078, type: 3}
   coin: {fileID: 926694228315119280, guid: 490882a5f3e6c044e9064c0411d6b54a, type: 3}
   leftDownPos: {fileID: 3260153089876326799}
   rightUpPos: {fileID: 3260153088552146314}

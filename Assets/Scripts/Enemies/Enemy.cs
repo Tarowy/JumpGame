@@ -1,3 +1,4 @@
+using System.Globalization;
 using Players;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace Enemies
         public float speed;
         public float hitForce;
         public GameObject bloodEffect;
+        public GameObject floatDamage;
 
         protected SpriteRenderer SpriteRenderer;
         protected Color OriginalColor;
@@ -50,6 +52,8 @@ namespace Enemies
 
         public void BeDamaged(float damage)
         {
+            Instantiate(floatDamage, transform.position + new Vector3(0, 1, 0), Quaternion.identity).transform
+                .GetChild(0).GetComponent<TextMesh>().text = damage.ToString(CultureInfo.InvariantCulture);
             health -= damage;
             EnemyHealth.ChangeHealth(health);
             FlashRed();

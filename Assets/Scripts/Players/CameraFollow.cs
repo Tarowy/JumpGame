@@ -38,7 +38,7 @@ namespace Players
 
         public void SetCameraPosLimit(Vector2 minPos, Vector2 maxPos)
         {
-        
+            
         }
     }
 }
