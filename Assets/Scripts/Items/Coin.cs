@@ -1,17 +1,19 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Coin : MonoBehaviour
+namespace Items
 {
-    private void Start()
+    public class Coin : MonoBehaviour
     {
-        Invoke("ChangeTag", 1f);
-    }
+        public AudioClip coinSound;
+        
+        private void Start()
+        {
+            Invoke("ChangeTag", 1f);
+        }
 
-    public void ChangeTag()
-    {
-        gameObject.tag = "Coin";
+        public void ChangeTag()
+        {
+            gameObject.tag = "Coin";
+        }
     }
 }

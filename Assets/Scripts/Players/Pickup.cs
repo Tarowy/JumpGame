@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Items;
 using UnityEngine;
 
 public class Pickup : MonoBehaviour
@@ -16,6 +17,7 @@ public class Pickup : MonoBehaviour
                 flySpeed * Time.deltaTime);
             if (Vector2.Distance(gameObject.transform.position, other.transform.position) <= 0.5)
             {
+                AudioSource.PlayClipAtPoint(other.GetComponent<Coin>().coinSound, other.transform.position);
                 Destroy(other.gameObject);
                 coinUI.ChangeCoinQuantity();
             }

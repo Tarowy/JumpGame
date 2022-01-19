@@ -13,6 +13,8 @@ TagManager:
   - Ladder
   - Coin
   - Sign
+  - Weapon
+  - TreasureBox
   layers:
   - Default
   - TransparentFX
@@ -29,7 +31,7 @@ TagManager:
   - TriggerBox
   - Item
   - Weapon
-  - 
+  - TreasureBox
   - 
   - 
   - 
