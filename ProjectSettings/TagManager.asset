@@ -32,8 +32,8 @@ TagManager:
   - Item
   - Weapon
   - TreasureBox
-  - 
-  - 
+  - Bomb
+  - Sign
   - 
   - 
   - 
@@ -60,6 +60,9 @@ TagManager:
     locked: 0
   - name: Item
     uniqueID: 1646706941
+    locked: 0
+  - name: Weapon
+    uniqueID: 488831601
     locked: 0
   - name: Player
     uniqueID: 1035051061
