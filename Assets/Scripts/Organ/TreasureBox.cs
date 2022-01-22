@@ -12,7 +12,6 @@ namespace Organ
         
         private Animator _animator;
         private bool _isOpened;
-        private bool _canOpen;
 
         public float radius;
         public float angleDegree; //角度
@@ -21,28 +20,12 @@ namespace Organ
         {
             _animator = transform.GetComponent<Animator>();
         }
-
-        private void Update()
-        {
-            if (_canOpen && Input.GetKeyDown(KeyCode.W))
-            {
-                OpenBox();
-            }
-        }
         
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Weapon"))
             {
-                _canOpen = true;
-            }
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                _canOpen = false;
+                OpenBox();
             }
         }
 

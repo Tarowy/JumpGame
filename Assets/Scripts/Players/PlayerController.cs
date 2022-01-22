@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Organ;
 using Tools;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,9 +32,21 @@ namespace Players
         private float _currentAttackCd;
         private bool _isLadder;
         private bool _isClimbing;
+        
+        public Animator _imageAnimator;
 
+        private InputSystem _inputSystem;
+        private Vector2 _move;
         private void Awake()
         {
+            _inputSystem = new InputSystem();
+            _inputSystem.JumpGame.Move.performed += ctx => _move = ctx.ReadValue<Vector2>(); //将输入Vect2的值输入到move
+            _inputSystem.JumpGame.Move.canceled += ctx => _move = Vector2.zero;
+            
+            _inputSystem.JumpGame.Jump.started += ctx => Jump();
+            _inputSystem.JumpGame.Attack.started += ctx => Attack();
+            _inputSystem.JumpGame.ChangeImage.started += ctx => ChangeImage();
+
             _rigidbody2D = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
             _feet = transform.GetChild(1).GetComponent<BoxCollider2D>();
@@ -49,11 +62,12 @@ namespace Players
         {
             if (canControl)
             {
-                Jump();
-                Attack();
+                // Jump();
+                // Attack();
                 DownPlatform();
                 ClimbLadder();
             }
+            ReduceCd();
             CheckStatus();
         }
 
@@ -65,13 +79,28 @@ namespace Players
             }
         }
 
+        private void OnEnable()
+        {
+            _inputSystem.JumpGame.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _inputSystem.JumpGame.Disable();
+        }
+
+        private void ChangeImage()
+        {
+            _imageAnimator.SetTrigger("change");
+        }
+        
         /// <summary>
         /// 行动控制
         /// </summary>
         private void Run()
         {
-            var axisH = Input.GetAxis("Horizontal");
-            if (axisH == 0)
+            // var axisH = Input.GetAxis("Horizontal");
+            if (_move.x == 0)
             {
                 _animator.SetBool("Run",false);
                 return;
@@ -79,23 +108,25 @@ namespace Players
             
             _animator.SetBool("Run",true);
 
-            if (axisH > 0.1f)
+            if (_move.x > 0.1f)
             {
                 transform.localRotation = Quaternion.Euler(0, 0, 0);
             }
-            if (axisH < -0.1f)
+            if (_move.x < -0.1f)
             {
                 transform.localRotation = Quaternion.Euler(0, 180, 0);
             }
 
             //直接改变刚体速度
-            _rigidbody2D.velocity = new Vector2(runSpeed * axisH, _rigidbody2D.velocity.y);
+            _rigidbody2D.velocity = new Vector2(runSpeed * _move.x, _rigidbody2D.velocity.y);
         }
 
         private void Jump()
         {
+            if (!canControl || _move.y < -0.1f) return;
+
             //如果按住S或者没按space就不执行
-            if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.S)) return;
+            // if (!Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.S)) return;
             
             if (_isGround)
             {
@@ -113,7 +144,9 @@ namespace Players
         
         public void DownPlatform()
         {
-            if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+            if (!canControl) return;
+            
+            if (_move.y<0.1f && _inputSystem.JumpGame.Jump.triggered)
             {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platform"), true);
                 Invoke(nameof(RestoreCollision),0.5f);
@@ -127,28 +160,31 @@ namespace Players
         
         public void ClimbLadder()
         {
+            if (!canControl) return;
+            
             if (_isLadder)
             {
-                var axisV = Input.GetAxis("Vertical");
+                // var axisV = Input.GetAxis("Vertical");
                 //如果处于梯子处，且有垂直输出，说明要爬梯子，但是脚部位于地面速度还向下的话就不会进入爬梯子状态
-                if (axisV > 0 && !_isClimbing && !_isPlatform) //为了让其在爬梯子的时候只执行一次
+                if (_move.y > 0 && !_isClimbing && !_isPlatform) //为了让其在爬梯子的时候只执行一次
                 {
                     _rigidbody2D.gravityScale = 0f;
                     _animator.SetBool("Climb",true);
                     _animator.SetBool("Jump",false); //防止跳跃途中上梯子导致下梯子后jump为true而处于跳跃动画
                     _isClimbing = true;
                 }
+                
                 if (_isClimbing)
                 {
-                    if (Math.Abs(axisV) < 0.5f)
+                    if (Math.Abs(_move.y) < 0.5f)
                     {
                         _rigidbody2D.velocity = new Vector2(0, 0);
                         _animator.speed = 0; //暂停动画
                         return;
                     }
                     _animator.speed = 1;
-                    _rigidbody2D.velocity = new Vector2(0, climbSpeed * axisV);
-                    if (_isGround && axisV < 0)
+                    _rigidbody2D.velocity = new Vector2(0, climbSpeed * _move.y);
+                    if (_isGround && _move.y < 0)
                     {
                         _animator.SetBool("Climb",false);
                         _isClimbing = false;
@@ -197,15 +233,21 @@ namespace Players
         /// </summary>
         private void Attack()
         {
-            if (_currentAttackCd > 0)
-            {
-                _currentAttackCd -= Time.deltaTime;
-            }
+            if (!canControl || _isClimbing) return;
 
-            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && Input.GetKey(KeyCode.J) && _currentAttackCd <= 0)
+            //当前播放的动画不是Attack才会攻击
+            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && _currentAttackCd <= 0)
             {
                 _animator.SetTrigger("Attack");
                 _currentAttackCd = attackCd;
+            }
+        }
+
+        public void ReduceCd()
+        {
+            if (_currentAttackCd > 0)
+            {
+                _currentAttackCd -= Time.deltaTime;
             }
         }
 
@@ -234,6 +276,14 @@ namespace Players
             {
                 _isLadder = true;
                 _gravityScale = _rigidbody2D.gravityScale;
+            }
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if (other.CompareTag("TreasureBox") && _move.y > 0.1f)
+            {
+                other.GetComponent<TreasureBox>().OpenBox();
             }
         }
 

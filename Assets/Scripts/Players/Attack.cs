@@ -14,11 +14,6 @@ namespace Players
             {
                 col.GetComponent<Enemy>().BeDamaged(damage);
             }
-
-            if (col.CompareTag("TreasureBox"))
-            {
-                col.GetComponent<TreasureBox>()?.OpenBox();
-            }
         }
     }
 }

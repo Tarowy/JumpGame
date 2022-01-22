@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +11,17 @@ namespace UI
 
         private GameObject _signIns;
 
+        private InputSystem _inputSystem;
+
+        private void Awake()
+        {
+            _inputSystem = new InputSystem();
+        }
+
         private void Update()
         {
+            Debug.Log("当前输入方案：" + _inputSystem);
+            
             if (_signIns == null) return;
             //文本框跟随
             if (Camera.main is { })
