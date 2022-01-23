@@ -7,7 +7,7 @@ namespace Enemies
     public class EnemyHealth : MonoBehaviour
     {
         public GameObject healthBarPrefab;
-        [HideInInspector]
+        // [HideInInspector]
         public GameObject healthIns;
         public float maxHealth;
         public float xOffset;
@@ -17,8 +17,10 @@ namespace Enemies
         
         private void Start()
         {
-            healthIns=Instantiate(healthBarPrefab, transform.position, Quaternion.identity, GameObject.Find("Canvas").transform);
+            healthIns = Instantiate(healthBarPrefab, transform.position, Quaternion.identity,
+                GameObject.Find("Canvas").transform);
             health = healthIns.transform.GetChild(0).GetComponent<Image>();
+            HideHealth();
         }
 
         // Update is called once per frame
@@ -48,12 +50,12 @@ namespace Enemies
 
         public void HideHealth()
         {
-            healthIns.SetActive(false);
+            healthIns.gameObject.SetActive(false);
         }
 
         public void ShowHealth()
         {
-            healthIns.SetActive(true);
+            healthIns.gameObject.SetActive(true);
         }
     }
 }

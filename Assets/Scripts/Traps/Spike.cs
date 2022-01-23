@@ -13,8 +13,10 @@ namespace Traps
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Player") && other.GetType().ToString().Equals("UnityEngine.CapsuleCollider2D"))
             {
+                Debug.Log("刺入");
+                
                 var playerHealth = other.GetComponent<PlayerHealth>();
                 if (playerHealth.BeDamaged(playerHealth.maxHealth * damagePercent))
                 {

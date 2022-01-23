@@ -34,14 +34,15 @@ namespace Players
         
         private void ThrowWeapon()
         {
-            if (projectile==null) return;
-            
-            Instantiate(projectile, transform.position, Quaternion.identity, gameObject.transform);
+            if (projectile == null) return;
+
+            Instantiate(projectile, transform.position, Quaternion.identity, gameObject.transform).transform.rotation =
+                transform.rotation;
         }
 
         private void ThrowBomb()
         {
-            if(bomb==null) return;
+            if (bomb == null) return;
             
             Instantiate(bomb, transform.position, Quaternion.identity, gameObject.transform).GetComponent<Bomb>()
                 .baseSpeed = new Vector2(_rigidbody2D.velocity.x * throwSpeedRate, _rigidbody2D.velocity.y);
