@@ -141,8 +141,8 @@ namespace Players
             _rigidbody2D.velocity = Vector2.up * new Vector2(0, jumpSpeed);
             currentJumpTimes--;
         }
-        
-        public void DownPlatform()
+
+        private void DownPlatform()
         {
             if (!canControl) return;
             
@@ -157,8 +157,8 @@ namespace Players
         {
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platform"), false);
         }
-        
-        public void ClimbLadder()
+
+        private void ClimbLadder()
         {
             if (!canControl) return;
             
@@ -202,7 +202,8 @@ namespace Players
             _isGround = _feet.IsTouchingLayers(LayerMask.GetMask("Ground")) || _isPlatform;
 
             //如果用是不是0来判断，速度很小无限趋近于静止的时候也会导致无法变为静止状态
-            if (Math.Abs(_rigidbody2D.velocity.x) < 0.5f && Math.Abs(_rigidbody2D.velocity.y) < 0.5f)
+            // if (Math.Abs(_rigidbody2D.velocity.x) < 0.5f && Math.Abs(_rigidbody2D.velocity.y) < 0.5f)
+            if (Math.Abs(_move.x) < 0.1f &&  Math.Abs(_move.y) < 0.1f)
             {
                 // Debug.Log("静止" + Time.time);
                 _animator.SetBool("Idle",true);
@@ -224,6 +225,7 @@ namespace Players
             }
 
             if (!(_rigidbody2D.velocity.y < 0.1f) || _isGround) return;
+            
             _animator.SetBool("Jump",false);
             _animator.SetBool("Fall", true);
         }
@@ -243,7 +245,7 @@ namespace Players
             }
         }
 
-        public void ReduceCd()
+        private void ReduceCd()
         {
             if (_currentAttackCd > 0)
             {
@@ -284,6 +286,11 @@ namespace Players
             if (other.CompareTag("TreasureBox") && _move.y > 0.1f)
             {
                 other.GetComponent<TreasureBox>().OpenBox();
+            }
+
+            if (other.CompareTag("Portal") && _move.y > 0.1f)
+            {
+                other.transform.parent.GetComponent<Portal>().DeliverPlayer(this.transform);
             }
         }
 

@@ -26,11 +26,6 @@ namespace Enemies
             EnemyHealth = GetComponent<EnemyHealth>();
             EnemyHealth.maxHealth = health;
         }
-    
-        public virtual void Start()
-        {
-            EnemyHealth.HideHealth();
-        }
 
         public virtual void Update()
         {

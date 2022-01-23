@@ -15,6 +15,7 @@ TagManager:
   - Sign
   - Weapon
   - TreasureBox
+  - Portal
   layers:
   - Default
   - TransparentFX

@@ -13,9 +13,8 @@ namespace Enemies
         [HideInInspector]
         public float waitTime;
 
-        public override void Start()
+        public void Start()
         {
-            base.Start();
             waitTime = startWaitTime;
             movePos = GenerateRandomPos();
         }
